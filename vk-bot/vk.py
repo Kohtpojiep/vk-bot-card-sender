@@ -9,6 +9,7 @@ import datetime
 #использование файлов
 import card.create_card as cc
 from vktoken import group_token
+from vktoken import group_id
 
 #Если нет соединения с вк
 def StartAgain():
@@ -20,17 +21,15 @@ def StartAgain():
 
 #объявление глобальных переменных
 vk = vk_api.VkApi(token=group_token)
-
-vk._auth_token()
-vk.get_api()
-longpoll = VkBotLongPoll(vk, 184139426)
-#except:
-#    StartAgain()
+try:
+    vk._auth_token()
+    vk.get_api()
+    longpoll = VkBotLongPoll(vk, group_id)
+except:
+    StartAgain()
 
 path = os.path.abspath(__file__)
 path = path[0:-5] #директория папки данного бота
-card_link = path + 'card\\'
-file_link = path + 'card\\avatar.jpg'
 res_link = path + 'card\\out.png'
 
 #отправка текстового сообщения
@@ -70,18 +69,13 @@ def directMessage(event):
         cc.create(info[1], info[2], info[3])
         send_card(peer_id)
 
-#try:
-#    while True:
-#        #прослушивание событий, то есть новых сообщений
-#        for event in longpoll.listen():
-#            if event.type == VkBotEventType.MESSAGE_NEW:
-#                if event.object.peer_id == event.object.from_id:
-#                    directMessage(event)
-#
-#except Exception as ex:
-#    StartAgain()
+try:
+    while True:
+        #прослушивание событий, то есть новых сообщений
+        for event in longpoll.listen():
+            if event.type == VkBotEventType.MESSAGE_NEW:
+                if event.object.peer_id == event.object.from_id:
+                    directMessage(event)
 
-for event in longpoll.listen():
-    if event.type == VkBotEventType.MESSAGE_NEW:
-        if event.object.peer_id == event.object.from_id:
-            directMessage(event)
+except Exception as ex:
+    StartAgain()
